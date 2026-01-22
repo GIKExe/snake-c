@@ -2,6 +2,8 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -14,7 +16,15 @@ typedef struct {
 	int x, y;
 } Point;
 
+void set_random_pos(Point *pos) {
+	pos->x = rand() % (WINDOW_WIDTH / GRID_SIZE);
+	pos->y = rand() % (WINDOW_HEIGHT / GRID_SIZE);
+}
+
 int main(int argc, char* argv[]) {
+	// 0. Инициализация Рандома
+	srand(time(NULL));
+
 	// 1. Инициализация SDL3
 	SDL_Init(SDL_INIT_VIDEO);
 	TTF_Init();
@@ -28,10 +38,12 @@ int main(int argc, char* argv[]) {
 	SDL_Event event;
 	
 	// Пример: инициализация змейки
-	Point snake[100] = {{5, 5}}; // Простой массив вместо списка для примера
+	Point snake[100];
+	set_random_pos(&snake[0]);
 	int snake_length = 1;
 	int direction = 0; // 0=right, 1=down, 2=left, 3=up
-	Point food = {10, 10};
+	Point food;
+	set_random_pos(&food);
 	
 	while (is_running) {
 		while (SDL_PollEvent(&event)) {
@@ -84,8 +96,7 @@ int main(int argc, char* argv[]) {
 		// Проверка съедения еды (упрощённо)
 		if (snake[0].x == food.x && snake[0].y == food.y) {
 			snake_length++;
-			food.x = rand() % (WINDOW_WIDTH / GRID_SIZE);
-			food.y = rand() % (WINDOW_HEIGHT / GRID_SIZE);
+			set_random_pos(&food);
 		}
 		
 		// Отрисовка
@@ -98,8 +109,8 @@ int main(int argc, char* argv[]) {
 			SDL_FRect rect = {
 				snake[i].x * GRID_SIZE,
 				snake[i].y * GRID_SIZE,
-				GRID_SIZE - 1,
-				GRID_SIZE - 1
+				GRID_SIZE,
+				GRID_SIZE
 			};
 			SDL_RenderFillRect(renderer, &rect);
 		}
