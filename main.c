@@ -1,5 +1,4 @@
 #include <SDL3/SDL.h>
-// #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -44,15 +43,19 @@ int main(int argc, char* argv[]) {
 					case SDLK_ESCAPE:
 						is_running = false;
 						break;
+					case SDLK_W:
 					case SDLK_UP:
 						if (direction != 1) direction = 3;
 						break;
+					case SDLK_S:
 					case SDLK_DOWN:
 						if (direction != 3) direction = 1;
 						break;
+					case SDLK_A:
 					case SDLK_LEFT:
 						if (direction != 0) direction = 2;
 						break;
+					case SDLK_D:
 					case SDLK_RIGHT:
 						if (direction != 2) direction = 0;
 						break;
