@@ -21,8 +21,6 @@ void set_random_pos(Point *pos) {
 	pos->y = rand() % (window_height / GRID_SIZE);
 }
 
-
-
 int main(int argc, char* argv[]) {
 	// 0. Инициализация Рандома
 	srand(time(NULL));
@@ -102,8 +100,9 @@ int main(int argc, char* argv[]) {
 		if (snake[0].y > WHL) snake[0].y = 0;
 		if (snake[0].y < 0) snake[0].y = WHL;
 		
-		// Проверка съедения еды (упрощённо)
+		// Проверка съедения еды
 		if (snake[0].x == food.x && snake[0].y == food.y) {
+			snake[snake_length] = snake[snake_length - 1];
 			snake_length++;
 			set_random_pos(&food);
 		}
