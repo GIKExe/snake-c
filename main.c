@@ -6,6 +6,8 @@
 #include <string.h>
 #include <time.h>
 
+#include "consola.c"
+
 int window_widht = 800;
 int window_height = 600;
 #define GRID_SIZE 20
@@ -323,13 +325,19 @@ int main(int argc, char* argv[]) {
 
 	// Сбор данных для расшаривания
 	Core core;
-	core.font16 = TTF_OpenFont(FONT_PATH, 16);
-	core.font20 = TTF_OpenFont(FONT_PATH, 20);
-	core.font48 = TTF_OpenFont(FONT_PATH, 48);
-	if (core.font16 == NULL) {
-		printf("Не удалось загрузить шрифт: ", FONT_PATH);
+	SDL_IOStream *io = SDL_IOFromConstMem(consola_ttf, sizeof(consola_ttf));
+	if (io == NULL) {
+		printf("Error: ", SDL_GetError());
 		exit(0);
 	}
+	core.font16 = TTF_OpenFontIO(io, false, 16);
+	if (core.font16 == NULL) {
+		printf("Error: ", SDL_GetError());
+		exit(0);
+	}
+	core.font20 = TTF_OpenFontIO(io, false, 20);
+	core.font48 = TTF_OpenFontIO(io, false, 48);
+	
 	
 	// Создание окна и рендерера
 	core.window = SDL_CreateWindow("Змейка", window_widht, window_height, SDL_WINDOW_RESIZABLE);
