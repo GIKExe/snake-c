@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 int window_widht = 800;
@@ -11,6 +12,10 @@ int window_height = 600;
 
 #define WWL window_widht / GRID_SIZE - 1
 #define WHL window_height / GRID_SIZE - 1
+
+#define FONT_PATH "ttf/consola.ttf"
+
+typedef unsigned char u8;
 
 typedef struct {
 	int x, y;
@@ -21,6 +26,19 @@ void set_random_pos(Point *pos) {
 	pos->y = rand() % (window_height / GRID_SIZE);
 }
 
+void draw_text(SDL_Renderer *renderer, TTF_Font *font, char *text, u8 x, u8 y, u8 r, u8 g, u8 b) {
+	SDL_Color color = {r, g, b, 255};
+	SDL_Surface *surface = TTF_RenderText_Blended(font, text, strlen(text), color);
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+	SDL_FRect srcrect = {0, 0, surface->w, surface->h};
+	SDL_FRect dstrect = {x, y, surface->w, surface->h};
+
+	SDL_RenderTexture(renderer, texture, &srcrect, &dstrect);
+	SDL_DestroySurface(surface);
+	SDL_DestroyTexture(texture);
+}
+
 int main(int argc, char* argv[]) {
 	// 0. Инициализация Рандома
 	srand(time(NULL));
@@ -28,9 +46,13 @@ int main(int argc, char* argv[]) {
 	// 1. Инициализация SDL3
 	SDL_Init(SDL_INIT_VIDEO);
 	TTF_Init();
+	TTF_Font *font = TTF_OpenFont(FONT_PATH, 16);
+	if (font == NULL) {
+		printf("Не удалось загрузить шрифт: ", FONT_PATH);
+		exit(0);
+	}
 	
 	// 2. Создание окна и рендерера
-	
 	SDL_Window* window = SDL_CreateWindow("Змейка", window_widht, window_height, SDL_WINDOW_RESIZABLE);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
 	
@@ -132,7 +154,11 @@ int main(int argc, char* argv[]) {
 			GRID_SIZE - 1
 		};
 		SDL_RenderFillRect(renderer, &food_rect);
-		
+
+		char result[29];
+		snprintf(result, sizeof(result), "Позиция: %hd, %hd", snake[0].x, snake[0].y);
+		draw_text(renderer, font, (char *) &result, 5, 5, 255, 0, 0);
+
 		SDL_RenderPresent(renderer);
 		SDL_Delay(100);
 	}
@@ -140,6 +166,7 @@ int main(int argc, char* argv[]) {
 	// 5. Очистка
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+	TTF_CloseFont(font);
 	TTF_Quit();
 	SDL_Quit();
 	
