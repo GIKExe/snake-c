@@ -4,3 +4,8 @@
 ```sh
 gcc main.c -o main.exe -I SDL3/include -L SDL3/lib -l SDL3 -l SDL3_ttf 
 ```
+
+или с флагом для собрки без консоли:
+```sh
+gcc main.c -o main.exe -I SDL3/include -L SDL3/lib -l SDL3 -l SDL3_ttf -mwindows
+```

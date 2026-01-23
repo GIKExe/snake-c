@@ -82,9 +82,13 @@ typedef struct {
 } Core;
 
 bool exit_flag = false;
+u16 count = 0;
+
+// #colors
 Color ColorRed = {255, 0, 0};
 Color ColorGreen = {0, 255, 0};
 Color ColorGold = {255, 182, 79};
+Color ColorPurple = {153, 76, 255};
 
 SnakeElement *new_element(SnakeElement *end_of_snake) {
 	SnakeElement *element = malloc(sizeof(SnakeElement));
@@ -94,6 +98,7 @@ SnakeElement *new_element(SnakeElement *end_of_snake) {
 	return element;
 }
 
+// #deathmenu
 void death_menu(Core *core) {
 	bool is_running = true;
 	SDL_Event event;
@@ -122,19 +127,25 @@ void death_menu(Core *core) {
 
 		char msg1[] = "Змейка сдохла!";
 		draw_text(core->renderer, core->font48, (char *) &msg1, 0, 0, &ColorRed, true, true);
-		char msg2[] = "нажмите пробел чтобы начать";
-		draw_text(core->renderer, core->font20, (char *) &msg2, 0, 40, &ColorRed, true, true);
+
+		char msg2[23];
+		snprintf(msg2, sizeof(msg2), "Ваш счёт: %hd", count);
+		draw_text(core->renderer, core->font20, (char *) &msg2, 0, 48, &ColorRed, true, true);
+
+		char msg3[] = "нажмите пробел чтобы начать";
+		draw_text(core->renderer, core->font20, (char *) &msg3, 0, 68, &ColorRed, true, true);
 
 		SDL_RenderPresent(core->renderer);
 		SDL_Delay(100);
 	}
 }
 
+// #gamemenu
 void game_menu(Core *core) {
 	bool is_running = true;
 	SDL_Event event;
 	
-	// Пример: инициализация змейки
+	bool walls_is_death = false;
 	SnakeElement *snake = malloc(sizeof(SnakeElement));
 	SnakeElement *end_of_snake = snake;
 	SnakeElement *element;
@@ -187,11 +198,22 @@ void game_menu(Core *core) {
 		// Проверка съедения еды
 		if (is_collide(&snake->pos, &food.pos)) {
 			end_of_snake = new_element(end_of_snake);
+			walls_is_death = food.color == &ColorPurple;
 			if (food.color == &ColorGold) {
 				end_of_snake = new_element(end_of_snake);
 			}
+			
 			set_random_pos(&food.pos);
-			food.color = (rand() % 100 < 10 ? &ColorGold : &ColorRed);
+			switch (rand() % 100) {
+				case 0 ... 9:
+					food.color = &ColorGold;
+					break;
+				case 10 ... 39:
+					food.color = &ColorPurple;
+					break;
+				default:
+					food.color = &ColorRed;
+			}
 		}
 		
 		// Логика движения змейки (с конца)
@@ -212,10 +234,18 @@ void game_menu(Core *core) {
 			case 3: snake->pos.y--; break; // up
 		}
 
-		if (snake->pos.x == 255) snake->pos.x = WWL;
-		if (snake->pos.x > WWL) snake->pos.x = 0;
-		if (snake->pos.y == 255) snake->pos.y = WHL;
-		if (snake->pos.y > WHL) snake->pos.y = 0;
+		if (snake->pos.x == 255) {
+			if (walls_is_death) is_running = false; else snake->pos.x = WWL;
+		}
+		if (snake->pos.x > WWL) {
+			if (walls_is_death) is_running = false; else snake->pos.x = 0;
+		}
+		if (snake->pos.y == 255) {
+			if (walls_is_death) is_running = false; else snake->pos.y = WHL;
+		}
+		if (snake->pos.y > WHL) {
+			if (walls_is_death) is_running = false; else snake->pos.y = 0;
+		}
 		
 		// обработка сталкивания 
 		element = end_of_snake;
@@ -255,9 +285,20 @@ void game_menu(Core *core) {
 			element = element->pred;
 		}
 
-		char result[25];
-		snprintf(result, sizeof(result), "Позиция: %hhd, %hhd", snake->pos.x, snake->pos.y);
-		draw_text(core->renderer, core->font16, (char *) &result, 5, 5, &ColorRed, false, false);
+		char msg1[25];
+		snprintf(msg1, sizeof(msg1), "Позиция: %hhd, %hhd", snake->pos.x, snake->pos.y);
+		draw_text(core->renderer, core->font16, (char *) &msg1, 5, 5, &ColorRed, false, false);
+
+		count = 0;
+		element = end_of_snake;
+		while (element != NULL) {
+			count++;
+			element = element->pred;
+		}
+
+		char msg2[16];
+		snprintf(msg2, sizeof(msg2), "Счёт: %hd", count);
+		draw_text(core->renderer, core->font16, (char *) &msg2, 5, 21, &ColorRed, false, false);
 
 		SDL_RenderPresent(core->renderer);
 		SDL_Delay(100);
