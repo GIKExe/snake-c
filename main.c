@@ -5,21 +5,23 @@
 #include <stdio.h>
 #include <time.h>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+int window_widht = 800;
+int window_height = 600;
 #define GRID_SIZE 20
 
-#define WWL WINDOW_WIDTH / GRID_SIZE - 1
-#define WHL WINDOW_HEIGHT / GRID_SIZE - 1
+#define WWL window_widht / GRID_SIZE - 1
+#define WHL window_height / GRID_SIZE - 1
 
 typedef struct {
 	int x, y;
 } Point;
 
 void set_random_pos(Point *pos) {
-	pos->x = rand() % (WINDOW_WIDTH / GRID_SIZE);
-	pos->y = rand() % (WINDOW_HEIGHT / GRID_SIZE);
+	pos->x = rand() % (window_widht / GRID_SIZE);
+	pos->y = rand() % (window_height / GRID_SIZE);
 }
+
+
 
 int main(int argc, char* argv[]) {
 	// 0. Инициализация Рандома
@@ -29,8 +31,9 @@ int main(int argc, char* argv[]) {
 	SDL_Init(SDL_INIT_VIDEO);
 	TTF_Init();
 	
-	// 2. Создание окна и рендерера (флаги изменились)
-	SDL_Window* window = SDL_CreateWindow("Змейка", WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+	// 2. Создание окна и рендерера
+	
+	SDL_Window* window = SDL_CreateWindow("Змейка", window_widht, window_height, SDL_WINDOW_RESIZABLE);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
 	
 	// 3. Основные переменные
@@ -47,31 +50,37 @@ int main(int argc, char* argv[]) {
 	
 	while (is_running) {
 		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_EVENT_QUIT) {
-				is_running = false;
-			}
-			if (event.type == SDL_EVENT_KEY_DOWN) {
-				switch(event.key.key) {
-					case SDLK_ESCAPE:
-						is_running = false;
-						break;
-					case SDLK_W:
-					case SDLK_UP:
-						if (direction != 1) direction = 3;
-						break;
-					case SDLK_S:
-					case SDLK_DOWN:
-						if (direction != 3) direction = 1;
-						break;
-					case SDLK_A:
-					case SDLK_LEFT:
-						if (direction != 0) direction = 2;
-						break;
-					case SDLK_D:
-					case SDLK_RIGHT:
-						if (direction != 2) direction = 0;
-						break;
-				}
+			switch (event.type) {
+				case SDL_EVENT_QUIT:
+					is_running = false;
+					break;
+				case SDL_EVENT_KEY_DOWN:
+					switch(event.key.key) {
+						case SDLK_ESCAPE:
+							is_running = false;
+							break;
+						case SDLK_W:
+						case SDLK_UP:
+							if (direction != 1) direction = 3;
+							break;
+						case SDLK_S:
+						case SDLK_DOWN:
+							if (direction != 3) direction = 1;
+							break;
+						case SDLK_A:
+						case SDLK_LEFT:
+							if (direction != 0) direction = 2;
+							break;
+						case SDLK_D:
+						case SDLK_RIGHT:
+							if (direction != 2) direction = 0;
+							break;
+					}
+					break;
+				case SDL_EVENT_WINDOW_RESIZED:
+					window_widht = event.window.data1;
+					window_height = event.window.data2;
+					break;
 			}
 		}
 		
