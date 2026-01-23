@@ -15,8 +15,6 @@ int window_height = 600;
 #define WWL window_widht / GRID_SIZE - 1
 #define WHL window_height / GRID_SIZE - 1
 
-#define FONT_PATH "ttf/consola.ttf"
-
 typedef   signed char i8;
 typedef unsigned char u8;
 typedef   signed short i16;
@@ -326,18 +324,9 @@ int main(int argc, char* argv[]) {
 	// Сбор данных для расшаривания
 	Core core;
 	SDL_IOStream *io = SDL_IOFromConstMem(consola_ttf, sizeof(consola_ttf));
-	if (io == NULL) {
-		printf("Error: ", SDL_GetError());
-		exit(0);
-	}
 	core.font16 = TTF_OpenFontIO(io, false, 16);
-	if (core.font16 == NULL) {
-		printf("Error: ", SDL_GetError());
-		exit(0);
-	}
 	core.font20 = TTF_OpenFontIO(io, false, 20);
 	core.font48 = TTF_OpenFontIO(io, false, 48);
-	
 	
 	// Создание окна и рендерера
 	core.window = SDL_CreateWindow("Змейка", window_widht, window_height, SDL_WINDOW_RESIZABLE);
@@ -356,6 +345,7 @@ int main(int argc, char* argv[]) {
 	TTF_CloseFont(core.font16);
 	TTF_CloseFont(core.font20);
 	TTF_CloseFont(core.font48);
+	SDL_CloseIO(io);
 	TTF_Quit();
 	SDL_Quit();
 	
