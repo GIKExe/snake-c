@@ -1,11 +1,6 @@
 
 # Простая змейка на языке C
-для сборки приложения используйте:
+для сборки на windows используйте (-mwindows для отключения консоли):
 ```sh
-gcc main.c -o main.exe -I SDL3/include -L SDL3/lib -l SDL3 -l SDL3_ttf 
-```
-
-или с флагом для собрки без консоли:
-```sh
-gcc main.c -o main.exe -I SDL3/include -L SDL3/lib -l SDL3 -l SDL3_ttf -mwindows
+gcc -o snake.exe snake.c -I raylib-5.5_win64_mingw-w64/include -L raylib-5.5_win64_mingw-w64/lib -l raylib -l opengl32 -l gdi32 -l winmm
 ```
