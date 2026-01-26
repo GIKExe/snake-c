@@ -1,6 +1,7 @@
 
 raylib/
 .vscode/
+test/
 *.exe
 *.zip
 *.7z
