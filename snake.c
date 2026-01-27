@@ -27,6 +27,8 @@ int screenHeight = 600;
 int gridSize = 20;
 #define WWL screenWidth / gridSize - 1
 #define WHL screenHeight / gridSize - 1
+#define NW screenWidth/gridSize*gridSize
+#define NH screenHeight/gridSize*gridSize
 Font font;
 
 typedef struct SnakeElement SnakeElement;
@@ -244,6 +246,12 @@ void gameMenu(bool *exitFlag, int *count) {
 
 		BeginDrawing();
 			ClearBackground(SUPERDARKGRAY);
+			if (walls_is_death) {
+				DrawRectangle(0, 0, NW, 2, RED);
+				DrawRectangle(0, 0, 2, NH, RED);
+				DrawRectangle(NW-1, 0, 1, NH, RED);
+				DrawRectangle(0, NH-1, NW, 1, RED);
+			}
 			DrawRectangle(food.pos.x*gridSize, food.pos.y*gridSize, gridSize, gridSize, food.color);
 			el = end_of_snake;
 			while (el != NULL) {
