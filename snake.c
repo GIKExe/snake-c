@@ -48,14 +48,14 @@ struct Food {
 };
 
 
-SnakeElement *new_element(SnakeElement *end_of_snake) {
+SnakeElement *new_element(SnakeElement *end_of_snake, int *count) {
 	SnakeElement *el = malloc(sizeof(SnakeElement));
 	el->pos.x = end_of_snake->pos.x;
 	el->pos.y = end_of_snake->pos.y;
 	el->el = end_of_snake;
+	(*count)++;
 	return el;
 }
-
 
 void deathMenu(bool *exitFlag, int *count) {
 	const char *msg1 = "Змейка сдохла!";
@@ -143,12 +143,32 @@ void gameMenu(bool *exitFlag, int *count) {
 
 		// Проверка съедения еды
 		if (snake->pos.x == food.pos.x && snake->pos.y == food.pos.y) {
-			(*count)++;
-			end_of_snake = new_element(end_of_snake);
-			walls_is_death = food.color.g == 122; // PURPLE
-			if (food.color.g == 203) { 						// GOLD
-				end_of_snake = new_element(end_of_snake);
-				(*count)++;
+			end_of_snake = new_element(end_of_snake, count);
+			walls_is_death = false;
+			switch (food.color.g) {
+				case 122:
+					walls_is_death = true;
+					break;
+				case 203:
+					end_of_snake = new_element(end_of_snake, count);
+					break;
+				case 109:
+					bool isPositive = (bool)(rand() & 1);
+					if (isPositive) {
+						for (int i = 0; i < 10; i++) {
+							end_of_snake = new_element(end_of_snake, count);
+						}
+					} else {
+						el = end_of_snake;
+						for (int i = 0; (i < 5) && (el != snake); i++) {
+							elo = el->el;
+							free(el);
+							el = elo;
+							end_of_snake = el;
+							(*count)--;
+						}
+					}
+					break;
 			}
 			
 			while (true) {
@@ -167,11 +187,14 @@ void gameMenu(bool *exitFlag, int *count) {
 			}
 			
 			switch (rand() % 100) {
-				case 0 ... 9:
+				case 0 ... 19:
 					food.color = GOLD;
 					break;
-				case 10 ... 39:
+				case 20 ... 49:
 					food.color = PURPLE;
+					break;
+				case 50 ... 54:
+					food.color = PINK;
 					break;
 				default:
 					food.color = RED;
